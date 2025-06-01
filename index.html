@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>コソ勉 - こっそり勉強時間記録アプリ</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>コソ勉</h1>
+        </header>
+
+        <nav class="tab-nav">
+            <button class="tab-button active" data-tab="pen-settings">色ペン設定</button>
+            <button class="tab-button" data-tab="grid">方眼紙</button>
+            <button class="tab-button" data-tab="stats">統計</button>
+        </nav>
+
+        <main class="tab-content">
+            <div id="pen-settings" class="tab-panel active">
+                <h2>色ペン設定</h2>
+                <p class="instructions">12種類のペンをつくれます。各ペンに科目名を設定してください（2文字推奨）</p>
+                <div class="pen-container">
+                    <div class="pen-item" data-pen-id="1" style="--pen-color: #FF6B6B;">
+                        <div class="pen-color"></div>
+                        <input type="text" class="subject-input" placeholder="科目名" maxlength="10">
+                    </div>
+                    <div class="pen-item" data-pen-id="2" style="--pen-color: #4ECDC4;">
+                        <div class="pen-color"></div>
+                        <input type="text" class="subject-input" placeholder="科目名" maxlength="10">
+                    </div>
+                    <div class="pen-item" data-pen-id="3" style="--pen-color: #45B7D1;">
+                        <div class="pen-color"></div>
+                        <input type="text" class="subject-input" placeholder="科目名" maxlength="10">
+                    </div>
+                    <div class="pen-item" data-pen-id="4" style="--pen-color: #FFA07A;">
+                        <div class="pen-color"></div>
+                        <input type="text" class="subject-input" placeholder="科目名" maxlength="10">
+                    </div>
+                    <div class="pen-item" data-pen-id="5" style="--pen-color: #98D8C8;">
+                        <div class="pen-color"></div>
+                        <input type="text" class="subject-input" placeholder="科目名" maxlength="10">
+                    </div>
+                    <div class="pen-item" data-pen-id="6" style="--pen-color: #FECA57;">
+                        <div class="pen-color"></div>
+                        <input type="text" class="subject-input" placeholder="科目名" maxlength="10">
+                    </div>
+                    <div class="pen-item" data-pen-id="7" style="--pen-color: #A29BFE;">
+                        <div class="pen-color"></div>
+                        <input type="text" class="subject-input" placeholder="科目名" maxlength="10">
+                    </div>
+                    <div class="pen-item" data-pen-id="8" style="--pen-color: #FD79A8;">
+                        <div class="pen-color"></div>
+                        <input type="text" class="subject-input" placeholder="科目名" maxlength="10">
+                    </div>
+                    <div class="pen-item" data-pen-id="9" style="--pen-color: #81ECEC;">
+                        <div class="pen-color"></div>
+                        <input type="text" class="subject-input" placeholder="科目名" maxlength="10">
+                    </div>
+                    <div class="pen-item" data-pen-id="10" style="--pen-color: #FDCB6E;">
+                        <div class="pen-color"></div>
+                        <input type="text" class="subject-input" placeholder="科目名" maxlength="10">
+                    </div>
+                    <div class="pen-item" data-pen-id="11" style="--pen-color: #6C5CE7;">
+                        <div class="pen-color"></div>
+                        <input type="text" class="subject-input" placeholder="科目名" maxlength="10">
+                    </div>
+                    <div class="pen-item" data-pen-id="12" style="--pen-color: #A8E6CF;">
+                        <div class="pen-color"></div>
+                        <input type="text" class="subject-input" placeholder="科目名" maxlength="10">
+                    </div>
+                </div>
+            </div>
+
+            <div id="grid" class="tab-panel">
+                <div class="grid-controls">
+                    <div class="pen-selector">
+                        <span>選択中のペン: </span>
+                        <div class="selected-pen-display"></div>
+                    </div>
+                    <div class="timer-display">
+                        <span>今日の勉強時間: </span>
+                        <span id="today-time">0時間0分</span>
+                    </div>
+                </div>
+                <div class="grid-container">
+                    <canvas id="study-grid"></canvas>
+                </div>
+                <div class="page-controls">
+                    <button id="prev-page">前のページ</button>
+                    <span id="page-display">ページ 1</span>
+                    <button id="next-page">次のページ</button>
+                    <button id="add-page">ページ追加</button>
+                </div>
+            </div>
+
+            <div id="stats" class="tab-panel">
+                <h2>学習統計</h2>
+                <div class="stats-container">
+                    <div class="total-time">
+                        <h3>総勉強時間</h3>
+                        <p id="total-study-time">0時間0分</p>
+                    </div>
+                    <div class="subject-stats">
+                        <h3>科目別勉強時間</h3>
+                        <div id="subject-chart"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
