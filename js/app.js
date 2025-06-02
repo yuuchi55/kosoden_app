@@ -9,6 +9,7 @@ class KosodenApp {
         this.cellSize = 25;
         this.isDrawing = false;
         this.isErasing = false;
+        this.audioContext = null;
         
         this.init();
     }
@@ -216,9 +217,20 @@ class KosodenApp {
         }
     }
 
+    getAudioContext() {
+        if (!this.audioContext || this.audioContext.state === 'closed') {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        // Resume context if it's suspended (due to browser autoplay policy)
+        if (this.audioContext.state === 'suspended') {
+            this.audioContext.resume();
+        }
+        return this.audioContext;
+    }
+
     playPencilSound() {
         try {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const audioContext = this.getAudioContext();
             
             // Create multiple oscillators for richer pencil sound
             const oscillator1 = audioContext.createOscillator();
@@ -262,6 +274,15 @@ class KosodenApp {
             oscillator1.stop(audioContext.currentTime + 0.1);
             oscillator2.stop(audioContext.currentTime + 0.1);
             oscillator3.stop(audioContext.currentTime + 0.1);
+            
+            // Clean up nodes after they finish
+            setTimeout(() => {
+                oscillator1.disconnect();
+                oscillator2.disconnect();
+                oscillator3.disconnect();
+                filter.disconnect();
+                gainNode.disconnect();
+            }, 110);
         } catch (e) {
             console.error('Pencil sound error:', e);
         }
@@ -269,7 +290,7 @@ class KosodenApp {
 
     playEraserSound() {
         try {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const audioContext = this.getAudioContext();
             const bufferSize = 4096;
             
             // Create brown noise for realistic eraser friction sound
@@ -322,12 +343,13 @@ class KosodenApp {
             // Clean up after sound finishes
             setTimeout(() => {
                 brownNoise.disconnect();
+                brownNoise.onaudioprocess = null;
                 lowpass1.disconnect();
                 highpass.disconnect();
                 bandpass.disconnect();
                 compressor.disconnect();
                 gainNode.disconnect();
-            }, 200);
+            }, 210);
         } catch (e) {
             console.error('Eraser sound error:', e);
         }
