@@ -47,6 +47,30 @@ class KosodenApp {
         localStorage.setItem('kosodenPens', JSON.stringify(this.pens));
         localStorage.setItem('kosodenPages', JSON.stringify(this.pages));
         localStorage.setItem('kosodenStudyData', JSON.stringify(this.studyData));
+        
+        // Auto commit and push to git
+        this.gitAutoSave();
+    }
+    
+    async gitAutoSave() {
+        try {
+            const timestamp = new Date().toLocaleString('ja-JP');
+            const commitMessage = `Auto save: ${timestamp}`;
+            
+            // Git operations via fetch to a backend endpoint
+            // Note: This requires a backend server to handle git operations
+            // For now, we'll just log the intention
+            console.log(`Would auto-commit with message: ${commitMessage}`);
+            
+            // In a real implementation, you would call:
+            // await fetch('/api/git-save', {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify({ message: commitMessage })
+            // });
+        } catch (error) {
+            console.error('Git auto-save error:', error);
+        }
     }
 
     initializeDefaultPens() {
@@ -193,18 +217,61 @@ class KosodenApp {
     }
 
     playPencilSound() {
-        const audio = new Audio();
-        // Pencil writing sound (higher pitch, shorter)
-        audio.src = 'data:audio/wav;base64,UklGRl4CAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YToCAADw/vD+8P4AABAAEA8ADwAAAOD/4P/g/wAAAAAQABAAEAAQAPD/8P/w//D/AAAQABAAEADw//D/8P/w/wAAEAAQABAA8P/w//D/8P8AABAAEAAQAPD/8P/w//D/AAAQABAAEADw//D/8P/w/wAAEAAQABAA8P/w//D/8P8AABAAEAAQAPD/8P/w//D/AAAQABAAEADw//D/8P/w/wAAEAAQABAA8P/w//D/8P8AABAAEAAQAPD/8P/w//D/AAAQABAAEADw//D/8P/w/wAAEAAQABAA8P/w//D/8P8AABAAEAAQAPD/8P/w//D/AAAQABAAEADw//D/8P/w/wAAEAAQABAA8P/w//D/8P8AABAAEAAQAPD/8P/w//D/AAAQABAAEADw//D/8P/w/wAAEAAQABAA';
-        audio.volume = 0.2;
-        audio.play().catch(() => {});
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Create multiple oscillators for richer pencil sound
+            const oscillator1 = audioContext.createOscillator();
+            const oscillator2 = audioContext.createOscillator();
+            const oscillator3 = audioContext.createOscillator();
+            
+            const gainNode = audioContext.createGain();
+            const filter = audioContext.createBiquadFilter();
+            
+            // Configure filter for pencil scratching sound
+            filter.type = 'highpass';
+            filter.frequency.value = 3000;
+            filter.Q.value = 10;
+            
+            // Connect oscillators
+            oscillator1.connect(filter);
+            oscillator2.connect(filter);
+            oscillator3.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // Set frequencies for pencil scratch sound
+            oscillator1.frequency.value = 4000 + Math.random() * 1000;
+            oscillator2.frequency.value = 6000 + Math.random() * 1500;
+            oscillator3.frequency.value = 8000 + Math.random() * 2000;
+            
+            oscillator1.type = 'sawtooth';
+            oscillator2.type = 'square';
+            oscillator3.type = 'triangle';
+            
+            // Louder volume and quick fade
+            gainNode.gain.value = 0.3;
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.1);
+            
+            // Start oscillators
+            oscillator1.start(audioContext.currentTime);
+            oscillator2.start(audioContext.currentTime);
+            oscillator3.start(audioContext.currentTime);
+            
+            // Stop after short duration
+            oscillator1.stop(audioContext.currentTime + 0.1);
+            oscillator2.stop(audioContext.currentTime + 0.1);
+            oscillator3.stop(audioContext.currentTime + 0.1);
+        } catch (e) {
+            console.error('Pencil sound error:', e);
+        }
     }
 
     playEraserSound() {
         const audio = new Audio();
         // Eraser rubbing sound (white noise-like)
         audio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YVYGAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==';
-        audio.volume = 0.15;
+        audio.volume = 0.3;
         audio.play().catch(() => {});
     }
 
