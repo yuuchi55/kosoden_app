@@ -8,6 +8,7 @@ class KosodenApp {
         this.gridSize = 20;
         this.cellSize = 25;
         this.isDrawing = false;
+        this.isErasing = false;
         
         this.init();
     }
@@ -118,6 +119,11 @@ class KosodenApp {
             this.currentPage = newPageNum;
             this.updateCanvas();
         });
+        
+        document.getElementById('eraser-button').addEventListener('click', () => {
+            this.isErasing = !this.isErasing;
+            this.updateEraserButton();
+        });
     }
 
     switchTab(tabName) {
@@ -176,7 +182,14 @@ class KosodenApp {
             const cellIndex = y * this.gridSize + x;
             const currentPen = this.pens.find(p => p.id === this.selectedPenId);
             
-            if (currentPen && currentPen.subject) {
+            if (this.isErasing) {
+                if (this.pages[this.currentPage][cellIndex]) {
+                    delete this.pages[this.currentPage][cellIndex];
+                    this.playEraserSound();
+                    this.saveData();
+                    this.updateCanvas();
+                }
+            } else if (currentPen && currentPen.subject) {
                 if (!this.pages[this.currentPage][cellIndex]) {
                     this.pages[this.currentPage][cellIndex] = {
                         color: currentPen.color,
@@ -184,7 +197,7 @@ class KosodenApp {
                         timestamp: Date.now()
                     };
                     
-                    this.playColorSound();
+                    this.playPencilSound();
                     this.updateStudyData(currentPen.subject);
                     this.saveData();
                     this.updateCanvas();
@@ -198,10 +211,19 @@ class KosodenApp {
         this.isDrawing = false;
     }
 
-    playColorSound() {
+    playPencilSound() {
         const audio = new Audio();
-        audio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjTHz/LVnzEELmu5p66dPBUCGomS1/DOdR8fMJLK566VYDoLfEC';
-        audio.volume = 0.3;
+        // Pencil writing sound (higher pitch, shorter)
+        audio.src = 'data:audio/wav;base64,UklGRl4CAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YToCAADw/vD+8P4AABAAEA8ADwAAAOD/4P/g/wAAAAAQABAAEAAQAPD/8P/w//D/AAAQABAAEADw//D/8P/w/wAAEAAQABAA8P/w//D/8P8AABAAEAAQAPD/8P/w//D/AAAQABAAEADw//D/8P/w/wAAEAAQABAA8P/w//D/8P8AABAAEAAQAPD/8P/w//D/AAAQABAAEADw//D/8P/w/wAAEAAQABAA8P/w//D/8P8AABAAEAAQAPD/8P/w//D/AAAQABAAEADw//D/8P/w/wAAEAAQABAA8P/w//D/8P8AABAAEAAQAPD/8P/w//D/AAAQABAAEADw//D/8P/w/wAAEAAQABAA8P/w//D/8P8AABAAEAAQAPD/8P/w//D/AAAQABAAEADw//D/8P/w/wAAEAAQABAA';
+        audio.volume = 0.2;
+        audio.play().catch(() => {});
+    }
+
+    playEraserSound() {
+        const audio = new Audio();
+        // Eraser rubbing sound (white noise-like)
+        audio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YVYGAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==';
+        audio.volume = 0.15;
         audio.play().catch(() => {});
     }
 
@@ -262,6 +284,17 @@ class KosodenApp {
         
         if (selectedPen) {
             display.style.backgroundColor = selectedPen.color;
+        }
+    }
+    
+    updateEraserButton() {
+        const eraserButton = document.getElementById('eraser-button');
+        if (this.isErasing) {
+            eraserButton.classList.add('active');
+            eraserButton.textContent = '消しゴム（ON）';
+        } else {
+            eraserButton.classList.remove('active');
+            eraserButton.textContent = '消しゴム';
         }
     }
 

@@ -142,6 +142,27 @@ header h1 {
     border: 2px solid #333;
 }
 
+.eraser-button {
+    margin-left: 1rem;
+    padding: 0.5rem 1rem;
+    background: #f0f0f0;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.eraser-button:hover {
+    background: #e0e0e0;
+}
+
+.eraser-button.active {
+    background: #ff6b6b;
+    color: white;
+    border-color: #ff5252;
+}
+
 .timer-display {
     font-weight: bold;
 }
