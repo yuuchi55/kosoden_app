@@ -147,32 +147,17 @@ class KosodenApp {
         canvas.width = this.gridSize * this.cellSize;
         canvas.height = this.gridSize * this.cellSize;
         
-        canvas.addEventListener('mousedown', (e) => this.startDrawing(e));
-        canvas.addEventListener('mousemove', (e) => this.draw(e));
-        canvas.addEventListener('mouseup', () => this.stopDrawing());
-        canvas.addEventListener('mouseleave', () => this.stopDrawing());
+        canvas.addEventListener('click', (e) => this.handleClick(e));
         
         canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            this.startDrawing(e.touches[0]);
+            this.handleClick(e.touches[0]);
         });
-        canvas.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            this.draw(e.touches[0]);
-        });
-        canvas.addEventListener('touchend', () => this.stopDrawing());
         
         this.updateCanvas();
     }
 
-    startDrawing(e) {
-        this.isDrawing = true;
-        this.draw(e);
-    }
-
-    draw(e) {
-        if (!this.isDrawing) return;
-        
+    handleClick(e) {
         const canvas = document.getElementById('study-grid');
         const rect = canvas.getBoundingClientRect();
         const x = Math.floor((e.clientX - rect.left) / this.cellSize);
@@ -205,10 +190,6 @@ class KosodenApp {
                 }
             }
         }
-    }
-
-    stopDrawing() {
-        this.isDrawing = false;
     }
 
     playPencilSound() {
