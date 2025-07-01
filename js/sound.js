@@ -127,17 +127,88 @@ class PencilSound {
     }
 }
 
+// 消しゴム音のクラス
+class EraserSound {
+    constructor() {
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        this.isPlaying = false;
+    }
+    
+    play() {
+        if (!app.soundEnabled || this.isPlaying) return;
+        
+        this.isPlaying = true;
+        const now = this.audioContext.currentTime;
+        
+        // 消しゴムの摩擦音を生成
+        const bufferSize = this.audioContext.sampleRate * 0.2; // 0.2秒
+        const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
+        const data = buffer.getChannelData(0);
+        
+        // ブラウンノイズを生成（低周波成分が多い）
+        let lastOut = 0.0;
+        for (let i = 0; i < bufferSize; i++) {
+            const white = Math.random() * 2 - 1;
+            data[i] = (lastOut + (0.02 * white)) / 1.02;
+            lastOut = data[i];
+            data[i] *= 3.5;
+        }
+        
+        const source = this.audioContext.createBufferSource();
+        source.buffer = buffer;
+        
+        // フィルターで消しゴム特有の音を作る
+        const filter1 = this.audioContext.createBiquadFilter();
+        filter1.type = 'lowpass';
+        filter1.frequency.value = 800;
+        filter1.Q.value = 2;
+        
+        const filter2 = this.audioContext.createBiquadFilter();
+        filter2.type = 'highpass';
+        filter2.frequency.value = 100;
+        filter2.Q.value = 0.7;
+        
+        // 音量エンベロープ
+        const gain = this.audioContext.createGain();
+        gain.gain.value = 0;
+        gain.gain.linearRampToValueAtTime(0.3, now + 0.02);
+        gain.gain.setValueAtTime(0.3, now + 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+        
+        // 接続
+        source.connect(filter1);
+        filter1.connect(filter2);
+        filter2.connect(gain);
+        gain.connect(this.audioContext.destination);
+        
+        source.start(now);
+        source.stop(now + 0.2);
+        
+        setTimeout(() => {
+            this.isPlaying = false;
+        }, 200);
+    }
+}
+
 // グローバル変数として初期化
 // AudioContextはユーザー操作後に初期化する必要がある
 let pencilSound = null;
+let eraserSound = null;
 
 function initPencilSound() {
     if (!pencilSound) {
         pencilSound = new PencilSound();
         window.pencilSound = pencilSound;
     }
+    if (!eraserSound) {
+        eraserSound = new EraserSound();
+        window.eraserSound = eraserSound;
+    }
     // AudioContextの再開を試みる
     if (pencilSound.audioContext.state === 'suspended') {
         pencilSound.audioContext.resume();
+    }
+    if (eraserSound.audioContext.state === 'suspended') {
+        eraserSound.audioContext.resume();
     }
 }

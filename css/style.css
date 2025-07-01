@@ -39,9 +39,10 @@ h1 {
 
 .main-content {
     display: grid;
-    grid-template-columns: 1fr 2fr;
+    grid-template-columns: 300px 1fr;
     gap: 20px;
     margin-bottom: 20px;
+    align-items: start;
 }
 
 .sidebar {
@@ -49,6 +50,10 @@ h1 {
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 20px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
 }
 
 .record-section {
@@ -109,6 +114,75 @@ h1 {
 
 .pen-selector {
     margin-bottom: 20px;
+}
+
+.tool-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.tool-section h3 {
+    margin-bottom: 15px;
+    color: #555;
+}
+
+.tool-buttons {
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+}
+
+.tool-button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    border: 2px solid #e0e0e0;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1em;
+    color: #333;
+}
+
+.tool-button:hover {
+    border-color: #999;
+    background: #f8f9fa;
+    transform: translateY(-2px);
+}
+
+.tool-button.active {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+.tool-icon {
+    font-size: 1.3em;
+}
+
+.eraser-button:hover {
+    border-color: #ffa07a;
+    background: #fff5f0;
+}
+
+.eraser-button.active {
+    background: #ffa07a;
+    color: white;
+    border-color: #ffa07a;
+}
+
+.clear-button:hover {
+    border-color: #e53e3e;
+    background: #ffebeb;
+}
+
+.clear-button:active {
+    background: #e53e3e;
+    color: white;
+    border-color: #e53e3e;
 }
 
 .pen-selector h3 {
@@ -229,7 +303,7 @@ h1 {
 .grid-container {
     position: relative;
     width: 100%;
-    height: 600px;
+    height: 500px;
     border: 2px solid #e0e0e0;
     border-radius: 8px;
     overflow: hidden;
@@ -256,6 +330,10 @@ h1 {
     cursor: pointer;
     transition: all 0.3s ease;
     opacity: 0;
+}
+
+.grid-square.eraser-mode {
+    cursor: crosshair;
 }
 
 .grid-square.filled {

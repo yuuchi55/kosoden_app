@@ -34,6 +34,14 @@ function initGrid() {
 
 // 次に塗るマスをハイライト
 function highlightNextSquare() {
+    // 消しゴムモードの場合はハイライトしない
+    if (app.eraserMode) {
+        document.querySelectorAll('.next-to-fill').forEach(el => {
+            el.classList.remove('next-to-fill');
+        });
+        return;
+    }
+    
     // 既存のハイライトを削除
     document.querySelectorAll('.next-to-fill').forEach(el => {
         el.classList.remove('next-to-fill');

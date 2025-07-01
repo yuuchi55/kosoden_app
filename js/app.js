@@ -13,6 +13,7 @@ const app = {
     soundEnabled: true,
     gridData: [],
     currentSquareIndex: 0,
+    eraserMode: false,
     stats: {
         totalSquares: 0,
         todaySquares: 0,
@@ -57,6 +58,12 @@ function setupEventListeners() {
     
     // グリッドクリック
     document.getElementById('gridContainer').addEventListener('click', handleGridClick);
+    
+    // 消しゴムボタン
+    document.getElementById('eraserButton').addEventListener('click', toggleEraser);
+    
+    // 全て消すボタン
+    document.getElementById('clearAllButton').addEventListener('click', clearAll);
 }
 
 // ペンリスナーの更新
@@ -258,12 +265,102 @@ function toggleTimerOption() {
 
 // グリッドクリックの処理
 function handleGridClick(e) {
-    const square = e.target.closest('.grid-square.next-to-fill');
-    if (square && !app.timer.isRunning) {
-        // 最初のクリック時にAudioContextを初期化
-        if (typeof initPencilSound === 'function') {
-            initPencilSound();
-        }
+    const square = e.target.closest('.grid-square');
+    if (!square) return;
+    
+    // 最初のクリック時にAudioContextを初期化
+    if (typeof initPencilSound === 'function') {
+        initPencilSound();
+    }
+    
+    if (app.eraserMode) {
+        // 消しゴムモード
+        eraseSquare(square);
+    } else if (square.classList.contains('next-to-fill') && !app.timer.isRunning) {
+        // 通常の塗りモード
         fillNextSquare();
     }
+}
+
+// 消しゴムモードの切り替え
+function toggleEraser() {
+    app.eraserMode = !app.eraserMode;
+    const eraserButton = document.getElementById('eraserButton');
+    const gridContainer = document.getElementById('gridContainer');
+    
+    if (app.eraserMode) {
+        eraserButton.classList.add('active');
+        gridContainer.style.cursor = 'crosshair';
+        // 全てのマスを消しゴムモードに
+        document.querySelectorAll('.grid-square').forEach(sq => {
+            sq.classList.add('eraser-mode');
+        });
+    } else {
+        eraserButton.classList.remove('active');
+        gridContainer.style.cursor = 'default';
+        document.querySelectorAll('.grid-square').forEach(sq => {
+            sq.classList.remove('eraser-mode');
+        });
+    }
+}
+
+// マスを消す
+function eraseSquare(square) {
+    const index = parseInt(square.dataset.index);
+    if (square.classList.contains('filled')) {
+        square.classList.remove('filled');
+        square.style.backgroundColor = '';
+        
+        // データから削除
+        if (app.gridData[index]) {
+            delete app.gridData[index];
+            app.stats.totalSquares--;
+            
+            // 今日のデータならtodaySquaresも減らす
+            const today = new Date().toDateString();
+            const squareDate = new Date(app.gridData[index]?.date).toDateString();
+            if (squareDate === today) {
+                app.stats.todaySquares--;
+            }
+        }
+        
+        // 現在のインデックスを更新
+        if (index < app.currentSquareIndex) {
+            app.currentSquareIndex = index;
+            highlightNextSquare();
+        }
+        
+        // 消しゴム音を鳴らす
+        if (app.soundEnabled && window.eraserSound) {
+            window.eraserSound.play();
+        }
+        
+        saveData();
+        updateDisplay();
+        updateStats();
+    }
+}
+
+// 全て消す
+function clearAll() {
+    if (!confirm('本当に全ての記録を消しますか？')) {
+        return;
+    }
+    
+    // 全てのマスを消す
+    document.querySelectorAll('.grid-square.filled').forEach(square => {
+        square.classList.remove('filled');
+        square.style.backgroundColor = '';
+    });
+    
+    // データをリセット
+    app.gridData = [];
+    app.currentSquareIndex = 0;
+    app.stats.totalSquares = 0;
+    app.stats.todaySquares = 0;
+    
+    highlightNextSquare();
+    saveData();
+    updateDisplay();
+    updateStats();
 }
