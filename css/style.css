@@ -125,10 +125,11 @@ h1 {
     margin-bottom: 30px;
 }
 
+/*=== 自分が追加した部分 ===*/
 .timer-display {
     font-size: 3em;
     font-weight: bold;
-    color: #667eea;
+    color: #3aeb8f; /* 紫#667eeaを緑に変更 20*/
     margin: 20px 0;
     font-variant-numeric: tabular-nums;
 }
