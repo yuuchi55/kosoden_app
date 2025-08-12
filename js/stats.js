@@ -17,6 +17,10 @@ function updateStats() {
     // 週平均（過去7日間の平均）
     const weeklyAvg = calculateWeeklyAverage();
     document.getElementById('weeklyAvg').textContent = weeklyAvg;
+    
+    // グラフを更新
+    updateWeeklyChart();
+    updateSubjectStats();
 }
 
 // 連続学習日数の更新
@@ -77,4 +81,121 @@ function calculateWeeklyAverage() {
     const avgHours = (totalSquares * 25 / 60 / 7).toFixed(1);
     
     return avgHours;
+}
+
+// 週間チャートの更新
+function updateWeeklyChart() {
+    const canvas = document.getElementById('weeklyChart');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width = canvas.offsetWidth;
+    const height = canvas.height = 200;
+    
+    // データを取得
+    const weekData = [];
+    const labels = [];
+    const today = new Date();
+    const days = ['日', '月', '火', '水', '木', '金', '土'];
+    
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - i);
+        const dateKey = `kosodenDaily_${date.toISOString().split('T')[0]}`;
+        const dayData = localStorage.getItem(dateKey);
+        
+        const squares = dayData ? JSON.parse(dayData).squares || 0 : 0;
+        const hours = (squares * 25 / 60).toFixed(1);
+        weekData.push(parseFloat(hours));
+        labels.push(days[date.getDay()]);
+    }
+    
+    // 最大値を取得
+    const maxValue = Math.max(...weekData, 1);
+    
+    // クリア
+    ctx.clearRect(0, 0, width, height);
+    
+    // グラフを描画
+    const barWidth = width / 7 * 0.7;
+    const barGap = width / 7 * 0.3;
+    const chartHeight = height - 40;
+    
+    weekData.forEach((value, index) => {
+        const barHeight = (value / maxValue) * chartHeight;
+        const x = index * (barWidth + barGap) + barGap / 2;
+        const y = height - barHeight - 20;
+        
+        // グラデーション
+        const gradient = ctx.createLinearGradient(0, y, 0, y + barHeight);
+        gradient.addColorStop(0, '#667eea');
+        gradient.addColorStop(1, '#764ba2');
+        
+        // バーを描画
+        ctx.fillStyle = gradient;
+        ctx.fillRect(x, y, barWidth, barHeight);
+        
+        // ラベル
+        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text-secondary');
+        ctx.font = '12px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(labels[index], x + barWidth / 2, height - 5);
+        
+        // 値
+        if (value > 0) {
+            ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text-primary');
+            ctx.fillText(value + 'h', x + barWidth / 2, y - 5);
+        }
+    });
+}
+
+// 科目別統計の更新
+function updateSubjectStats() {
+    const subjectData = {};
+    
+    // データを集計
+    app.gridData.forEach(data => {
+        if (data && data.subject) {
+            if (!subjectData[data.subject]) {
+                subjectData[data.subject] = { count: 0, color: data.color };
+            }
+            subjectData[data.subject].count++;
+        }
+    });
+    
+    // 表示を更新
+    const container = document.getElementById('subjectBars');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    const maxCount = Math.max(...Object.values(subjectData).map(d => d.count), 1);
+    
+    Object.entries(subjectData).forEach(([subject, data]) => {
+        if (!subject) return;
+        
+        const percentage = (data.count / maxCount) * 100;
+        const hours = (data.count * 25 / 60).toFixed(1);
+        
+        const barDiv = document.createElement('div');
+        barDiv.className = 'subject-bar';
+        
+        barDiv.innerHTML = `
+            <div class="subject-bar-label">
+                <span>${subject}</span>
+                <span>${hours}時間</span>
+            </div>
+            <div class="subject-bar-track">
+                <div class="subject-bar-fill" style="width: ${percentage}%; background: ${data.color};">
+                    ${Math.round(percentage)}%
+                </div>
+            </div>
+        `;
+        
+        container.appendChild(barDiv);
+    });
+    
+    if (Object.keys(subjectData).length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">まだデータがありません</p>';
+    }
 }

@@ -104,10 +104,19 @@
                     <div class="stat-label">週平均（時間）</div>
                 </div>
             </div>
+            <div class="chart-container">
+                <h4>週間学習グラフ</h4>
+                <canvas id="weeklyChart"></canvas>
+            </div>
+            <div class="subject-stats">
+                <h4>科目別学習時間</h4>
+                <div id="subjectBars"></div>
+            </div>
         </div>
     </div>
 
     <button class="sound-toggle" id="soundToggle">🔊</button>
+    <button class="theme-toggle" id="themeToggle">🌙</button>
 
     <script src="js/app.js"></script>
     <script src="js/timer.js"></script>

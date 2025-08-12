@@ -87,6 +87,14 @@ function fillNextSquare() {
         app.stats.totalSquares++;
         app.stats.todaySquares++;
         
+        // マイルストーン通知
+        if (app.stats.totalSquares % 10 === 0) {
+            showNotification(`🎉 ${app.stats.totalSquares}マス達成！`);
+        }
+        if (app.stats.todaySquares === 4) {
+            showNotification('🔥 今日の目標達成！素晴らしい！');
+        }
+        
         // 次のマスに移動
         app.currentSquareIndex++;
         highlightNextSquare();
@@ -96,4 +104,19 @@ function fillNextSquare() {
         updateDisplay();
         updateStats();
     }
+}
+
+// 通知を表示
+function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideInNotification 0.5s ease-out reverse';
+        setTimeout(() => {
+            notification.remove();
+        }, 500);
+    }, 3000);
 }

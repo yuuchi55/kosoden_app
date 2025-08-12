@@ -33,10 +33,20 @@ const app = {
 // 初期化
 function init() {
     loadData();
+    loadTheme();
     setupEventListeners();
     initGrid();
     updateDisplay();
     updateStats();
+}
+
+// テーマの読み込み
+function loadTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        document.getElementById('themeToggle').textContent = '☀️';
+    }
 }
 
 // イベントリスナーの設定
@@ -55,6 +65,9 @@ function setupEventListeners() {
     
     // サウンドトグル
     document.getElementById('soundToggle').addEventListener('click', toggleSound);
+    
+    // テーマトグル
+    document.getElementById('themeToggle').addEventListener('click', toggleTheme);
     
     // グリッドクリック
     document.getElementById('gridContainer').addEventListener('click', handleGridClick);
@@ -173,6 +186,22 @@ function toggleSound() {
     const button = document.getElementById('soundToggle');
     button.textContent = app.soundEnabled ? '🔊' : '🔇';
     button.classList.toggle('muted', !app.soundEnabled);
+}
+
+// テーマ切り替え
+function toggleTheme() {
+    const body = document.body;
+    const button = document.getElementById('themeToggle');
+    
+    if (body.classList.contains('dark-mode')) {
+        body.classList.remove('dark-mode');
+        button.textContent = '🌙';
+        localStorage.setItem('theme', 'light');
+    } else {
+        body.classList.add('dark-mode');
+        button.textContent = '☀️';
+        localStorage.setItem('theme', 'dark');
+    }
 }
 
 // 表示更新
