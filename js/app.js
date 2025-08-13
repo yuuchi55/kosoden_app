@@ -388,6 +388,11 @@ function clearAll() {
     app.stats.totalSquares = 0;
     app.stats.todaySquares = 0;
     
+    // 消しゴムモードを解除してから次のマスをハイライト
+    if (app.eraserMode) {
+        toggleEraser();
+    }
+    
     highlightNextSquare();
     saveData();
     updateDisplay();
