@@ -3,7 +3,7 @@
 // 統計更新
 function updateStats() {
     // 総学習時間（時間）
-    const totalHours = Math.floor(app.stats.totalSquares * 25 / 60);
+    const totalHours = (app.stats.totalSquares * 25 / 60).toFixed(1);
     document.getElementById('totalHours').textContent = totalHours;
     
     // 今日の学習時間（時間）

@@ -1,3 +1,7 @@
+function escapeAttr(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 // アプリケーションの状態管理
 const app = {
     timer: {
@@ -87,7 +91,23 @@ function updatePenListeners() {
         
         // ペン色クリックで選択
         penColor.addEventListener('click', () => selectPen(index));
-        
+
+        // カラーピッカーで色を変更
+        const colorPicker = item.querySelector('.color-picker');
+        if (colorPicker) {
+            colorPicker.addEventListener('input', (e) => {
+                const newColor = e.target.value;
+                if (index < app.pens.length) {
+                    app.pens[index].color = newColor;
+                    penColor.style.backgroundColor = newColor;
+                    if (index === app.selectedPenId) {
+                        app.selectedColor = newColor;
+                    }
+                    saveData();
+                }
+            });
+        }
+
         // 入力フィールドの変更を保存
         input.addEventListener('input', (e) => {
             if (index < app.pens.length) {
@@ -151,8 +171,10 @@ function updatePenList() {
         penItem.dataset.penId = index;
         
         penItem.innerHTML = `
-            <div class="pen-color" style="background-color: ${pen.color};"></div>
-            <input type="text" class="pen-name-input" placeholder="科目名" value="${pen.subject || ''}">
+            <div class="pen-color" style="background-color: ${pen.color};" title="クリックで色を変更">
+                <input type="color" class="color-picker" value="${pen.color}">
+            </div>
+            <input type="text" class="pen-name-input" placeholder="科目名" value="${escapeAttr(pen.subject || '')}">
             ${app.pens.length > 1 ? '<span class="pen-delete" onclick="deletePen(' + index + ')">×</span>' : ''}
         `;
         
@@ -342,14 +364,14 @@ function eraseSquare(square) {
         
         // データから削除
         if (app.gridData[index]) {
+            const squareData = app.gridData[index];
             delete app.gridData[index];
-            app.stats.totalSquares--;
-            
+            app.stats.totalSquares = Math.max(0, app.stats.totalSquares - 1);
+
             // 今日のデータならtodaySquaresも減らす
             const today = new Date().toDateString();
-            const squareDate = new Date(app.gridData[index]?.date).toDateString();
-            if (squareDate === today) {
-                app.stats.todaySquares--;
+            if (new Date(squareData.date).toDateString() === today) {
+                app.stats.todaySquares = Math.max(0, app.stats.todaySquares - 1);
             }
         }
         

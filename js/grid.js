@@ -68,7 +68,6 @@ function fillNextSquare() {
                 initPencilSound();
             }
             if (window.pencilSound) {
-                console.log('色鉛筆音を再生:', app.selectedColor);
                 window.pencilSound.play(app.selectedColor);
             }
         }
