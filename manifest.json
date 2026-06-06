@@ -1,0 +1,25 @@
+{
+    "name": "コソ勉",
+    "short_name": "コソ勉",
+    "description": "25分単位で学習を記録 - 色鉛筆で塗る感覚で楽しく勉強",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#f8f9fa",
+    "theme_color": "#667eea",
+    "orientation": "portrait-primary",
+    "lang": "ja",
+    "icons": [
+        {
+            "src": "/icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}
