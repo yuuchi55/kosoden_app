@@ -15,6 +15,7 @@ const app = {
     selectedSubject: '数学',
     selectedPenId: 0,
     soundEnabled: true,
+    dailyGoal: 4,
     gridData: [],
     currentSquareIndex: 0,
     eraserMode: false,
@@ -42,6 +43,7 @@ function init() {
     initGrid();
     updateDisplay();
     updateStats();
+    updateGoalHint();
     initMobileNav();
 }
 
@@ -89,6 +91,15 @@ function setupEventListeners() {
     
     // グリッドクリック
     document.getElementById('gridContainer').addEventListener('click', handleGridClick);
+
+    // 目標入力
+    document.getElementById('dailyGoalInput').addEventListener('input', (e) => {
+        const val = Math.max(1, Math.min(24, parseInt(e.target.value) || 1));
+        app.dailyGoal = val;
+        updateGoalHint();
+        updateGoalBar();
+        saveData();
+    });
     
     // 消しゴムボタン
     document.getElementById('eraserButton').addEventListener('click', toggleEraser);
@@ -244,6 +255,26 @@ function toggleTheme() {
 function updateDisplay() {
     document.getElementById('todayCount').textContent = app.stats.todaySquares;
     document.getElementById('totalCount').textContent = app.stats.totalSquares;
+    updateGoalBar();
+}
+
+// 目標バー更新
+function updateGoalBar() {
+    const today = app.stats.todaySquares;
+    const goal = app.dailyGoal;
+    const pct = Math.min(100, (today / goal) * 100);
+    const fill = document.getElementById('goalBarFill');
+    const label = document.getElementById('goalBarLabel');
+    fill.style.width = pct + '%';
+    fill.classList.toggle('completed', today >= goal);
+    label.textContent = `${today} / ${goal}マス`;
+}
+
+// 目標時間ヒント更新
+function updateGoalHint() {
+    const hours = (app.dailyGoal * 25 / 60).toFixed(1);
+    document.getElementById('goalHoursHint').textContent = `= 約 ${hours} 時間`;
+    document.getElementById('dailyGoalInput').value = app.dailyGoal;
 }
 
 // データ保存
@@ -254,6 +285,7 @@ function saveData() {
         stats: app.stats,
         pens: app.pens,
         selectedPenId: app.selectedPenId,
+        dailyGoal: app.dailyGoal,
         lastSaveDate: new Date().toISOString()
     };
     localStorage.setItem('kosodenData', JSON.stringify(data));
@@ -269,6 +301,7 @@ function loadData() {
         app.stats = data.stats || app.stats;
         app.pens = data.pens || app.pens;
         app.selectedPenId = data.selectedPenId || 0;
+        app.dailyGoal = data.dailyGoal || 4;
         
         // 今日の統計をリセット
         const today = new Date().toDateString();

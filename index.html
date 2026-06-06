@@ -75,6 +75,16 @@
                         </button>
                     </div>
                 </div>
+
+                <div class="goal-section">
+                    <h3>目標設定</h3>
+                    <div class="goal-input-row">
+                        <span>1日</span>
+                        <input type="number" id="dailyGoalInput" class="goal-input" min="1" max="24" value="4">
+                        <span>マス</span>
+                    </div>
+                    <p class="goal-hours-hint" id="goalHoursHint">= 約 1.7 時間</p>
+                </div>
             </div>
 
             <div class="grid-area">
@@ -84,6 +94,12 @@
                         <span>今日: <strong id="todayCount">0</strong>マス</span>
                         <span>合計: <strong id="totalCount">0</strong>マス</span>
                     </div>
+                </div>
+                <div class="goal-bar">
+                    <div class="goal-bar-track">
+                        <div class="goal-bar-fill" id="goalBarFill"></div>
+                    </div>
+                    <span class="goal-bar-label" id="goalBarLabel">0 / 4マス</span>
                 </div>
                 <div class="grid-container" id="gridContainer"></div>
                 <p class="grid-instruction">クリックで次のマスに色を塗ります</p>

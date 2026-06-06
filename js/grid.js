@@ -90,7 +90,7 @@ function fillNextSquare() {
         if (app.stats.totalSquares % 10 === 0) {
             showNotification(`🎉 ${app.stats.totalSquares}マス達成！`);
         }
-        if (app.stats.todaySquares === 4) {
+        if (app.stats.todaySquares === app.dailyGoal) {
             showNotification('🔥 今日の目標達成！素晴らしい！');
         }
         
